@@ -1,0 +1,24 @@
+{
+  "name": "postfromcsv",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/couchsoft/postfromcsv.git"
+  },
+  "author": "couchsoft",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/couchsoft/postfromcsv/issues"
+  },
+  "homepage": "https://github.com/couchsoft/postfromcsv#readme",
+  "dependencies": {
+    "@tryghost/admin-api": "^1.0.2",
+    "csv-parse": "^4.8.5",
+    "yargs": "^15.1.0"
+  }
+}
