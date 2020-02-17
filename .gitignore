@@ -105,3 +105,6 @@ dist
 
 # Test data
 *.csv
+
+# IDE
+.vscode/*

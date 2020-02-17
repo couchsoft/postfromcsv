@@ -7,20 +7,37 @@ if (!argv.file)
 	console.error('please specify file to import using "--file"')
 if (!argv.author)
 	console.error('please specify author mail address using "--author"')
+if (!argv.url)
+	console.error('please specify your blogs url using "--url"')
+if (!argv.key)
+	console.error('please specify your admin api key using "--key"')
 
 const api = new GhostAdminAPI({
-	url: 'http://localhost:2368',
-	key: '5e41113673513e3848a5b698:6ac9d54303f48d68746620c1667d8bef227e9982074db214b5927c732f2e1cbd',
+	url: argv.url,
+	key: argv.key,
 	version: 'v3'
 });
 
+// delayed execution is required to not run in rate limiting
+Array.prototype.delayedForEach = function (callback, timeout, thisArg) {
+	var i = 0,
+		l = this.length,
+		self = this,
+		caller = function () {
+			callback.call(thisArg || self, self[i], i, self);
+			(++i < l) && setTimeout(caller, timeout);
+		};
+	caller();
+};
+
 let records = readCsvFile();
-records.forEach(record => {
+records.delayedForEach(function (record) {
 	let post = buildPostFromCsvRecord(record);
+
 	api.posts.add(post, { source: 'html' })
-		.then(res => console.log(JSON.stringify(res)))
-		.catch(err => console.error(err));
-});
+		.then(res => console.log("creating post ", post.title, " succeeded, id is ", res.id))
+		.catch(err => console.error("creating post ", post.title, " failed with message: ", err));
+}, 1000);
 
 function readCsvFile() {
 	let csvContent = fs.readFileSync(argv.file);
@@ -45,7 +62,7 @@ function buildPostFromCsvRecord(record) {
 		title: record.Title,
 		custom_excerpt: `${record.Title} ${record.Location}, ${record.Year}.`,
 		html: html,
-		status: 'published',
+		status: 'draft',
 		published_at: publishedAt,
 		authors: [argv.author],
 		tags: [record.Tag]
